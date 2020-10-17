@@ -106,7 +106,8 @@ while True:
     WebDriverWait(driver,600000).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div[1]/div[2]/ul/li[3]')))
     total_page = int(driver.find_elements_by_css_selector('.form-control')[0].find_element_by_xpath('..').text.replace('/','').strip())
     # 遍历每一页
-    for i in range(page,total_page):  
+    # 循环范围应该到total_page+1，否则不会读取最后一页信息
+    for i in range(page,total_page + 1):  
         tips("正在导出，当前在第"+str(page)+"页")
         es = driver.find_elements_by_css_selector('.content_listx')
         c = len(es)
@@ -149,12 +150,14 @@ while True:
         # 超出查询限制，不继续查询，退出
         if stop:
             break
-        # 防止频率过高，休息一下
-        tips("准备抓取下一页")
-        time.sleep(5)
-        # 待处理页码+1
-        page = page + 1
-        tips("正在查询第"+str(page)+"个页面")
+        # 打印下一次要抓取页面的信息，如果当前页到了最后一页，则不再打印抓取下一页的信息
+        if page < total_page:
+            # 防止频率过高，休息一下
+            tips("准备抓取下一页")
+            time.sleep(5)
+            # 待处理页码+1
+            page = page + 1
+            tips("正在查询第"+str(page)+"个页面")
         # 保存当前页码
         current_page_sheet.write(0,0,str(page))
         # 保存本页数据
